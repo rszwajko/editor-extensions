@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
   // const { activateExtension } = await import("./activate");
   try {
     new VsCodeExtension(context);
-    console.log("Extension activated");
+    console.log("Foo foo! Extension activated");
   } catch (e) {
     console.log("Error activating extension: ", e);
     vscode.window
