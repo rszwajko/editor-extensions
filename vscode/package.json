@@ -259,7 +259,8 @@
     ]
   },
   "lint-staged": {
-    "*": "prettier --ignore-unknown --write"
+    "*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}": "eslint --fix",
+    "*.{css,json,md,yaml,yml}": "prettier --write"
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
