@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 import { VsCodeExtension } from "./VsCodeExtension";
 import { AnalyzerClient } from "./client/analyzerClient";
+import { registerDiffView } from "./diffView";
 
 let client: AnalyzerClient;
 
@@ -34,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
   }
+  registerDiffView(context);
 }
 
 // This method is called when your extension is deactivated
