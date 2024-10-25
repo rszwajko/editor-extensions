@@ -11,6 +11,7 @@ import {
   ViewColumn,
   workspace,
 } from "vscode";
+import loadResultsCommands from "./data/loadResults";
 
 let fullScreenPanel: WebviewPanel | undefined;
 
@@ -39,7 +40,6 @@ const commandsMap: (state: ExtensionState) => {
         window.showErrorMessage("Analyzer must be started before run!");
         return;
       }
-      analyzerClient.clearStoredRulesets();
 
       if (fullScreenPanel && fullScreenPanel.webview) {
         analyzerClient.runAnalysis(fullScreenPanel.webview);
@@ -95,17 +95,6 @@ const commandsMap: (state: ExtensionState) => {
       panel.webview.html = sidebarProvider._getHtmlForWebview(panel.webview);
 
       setupWebviewMessageListener(panel.webview, state);
-
-      panel.webview.onDidReceiveMessage(
-        (message) => {
-          if (message.command === "webviewReady") {
-            console.log("Webview is ready");
-            state.analyzerClient.populateWebviewWithStoredRulesets(panel.webview);
-          }
-        },
-        undefined,
-        extensionContext.subscriptions,
-      );
 
       if (state.sidebarProvider) {
         commands.executeCommand("workbench.action.closeSidebar");
@@ -307,7 +296,11 @@ const commandsMap: (state: ExtensionState) => {
 };
 
 export function registerAllCommands(state: ExtensionState) {
-  for (const [command, callback] of Object.entries(commandsMap(state))) {
+  const allCommands = {
+    ...commandsMap(state),
+    ...loadResultsCommands(state),
+  };
+  for (const [command, callback] of Object.entries(allCommands)) {
     state.extensionContext.subscriptions.push(commands.registerCommand(command, callback));
   }
 }
