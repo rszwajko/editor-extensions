@@ -54,7 +54,7 @@ const tsConfig = {
       ecmaFeatures: {
         jsx: true,
       },
-      project: true,
+      projectService: true,
       tsconfigRootDir: ".",
     },
   },
