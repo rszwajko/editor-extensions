@@ -11,7 +11,8 @@ import {
   ViewColumn,
   workspace,
 } from "vscode";
-import loadResultsCommands from "./data/loadResults";
+import { cleanRuleSets, loadRuleSets, loadStaticResults } from "./data";
+import { RuleSet } from "@shared/types";
 
 let fullScreenPanel: WebviewPanel | undefined;
 
@@ -292,15 +293,14 @@ const commandsMap: (state: ExtensionState) => {
       // Update the user settings
       await config.update("labelSelector", modifiedLabelSelector, ConfigurationTarget.Workspace);
     },
+    "konveyor.loadRuleSets": (ruleSets: RuleSet[]): void => loadRuleSets(state, ruleSets),
+    "konveyor.cleanRuleSets": () => cleanRuleSets(state),
+    "konveyor.loadStaticResults": loadStaticResults,
   };
 };
 
 export function registerAllCommands(state: ExtensionState) {
-  const allCommands = {
-    ...commandsMap(state),
-    ...loadResultsCommands(state),
-  };
-  for (const [command, callback] of Object.entries(allCommands)) {
+  for (const [command, callback] of Object.entries(commandsMap(state))) {
     state.extensionContext.subscriptions.push(commands.registerCommand(command, callback));
   }
 }
