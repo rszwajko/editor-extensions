@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Original file copied from: https://github.com/microsoft/vscode-extension-samples/blob/7ce43a47d7a53935b093a0e10fc490ea6a3cec32/fsprovider-sample/src/fileSystemProvider.ts#L1
+ *  Contains substantial parts of: https://github.com/microsoft/vscode-extension-samples/blob/7ce43a47d7a53935b093a0e10fc490ea6a3cec32/fsprovider-sample/src/fileSystemProvider.ts#L1
  *
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License.
@@ -156,12 +156,26 @@ export class MemFS implements vscode.FileSystemProvider {
     if (!parent.entries.has(basename)) {
       throw vscode.FileSystemError.FileNotFound(uri);
     }
-    parent.entries.delete(basename);
+    this._delete({ parent, childrenNames: [basename], parentUri: dirname, childrenUri: [uri] });
+  }
+
+  _delete({
+    parent,
+    childrenNames,
+    parentUri,
+    childrenUri,
+  }: {
+    parent: Directory;
+    childrenNames: string[];
+    parentUri: vscode.Uri;
+    childrenUri: vscode.Uri[];
+  }): void {
+    childrenNames.forEach((basename) => parent.entries.delete(basename));
     parent.mtime = Date.now();
     parent.size -= 1;
     this._fireSoon(
-      { type: vscode.FileChangeType.Changed, uri: dirname },
-      { uri, type: vscode.FileChangeType.Deleted },
+      { type: vscode.FileChangeType.Changed, uri: parentUri },
+      ...childrenUri.map((uri) => ({ uri, type: vscode.FileChangeType.Deleted })),
     );
   }
 
@@ -252,5 +266,66 @@ export class MemFS implements vscode.FileSystemProvider {
       this._emitter.fire(this._bufferedEvents);
       this._bufferedEvents.length = 0;
     }, 5);
+  }
+
+  removeAll(scheme: string) {
+    const childrenNames = Array.from(this.root.entries.keys());
+    this._delete({
+      parent: this.root,
+      childrenNames,
+      parentUri: vscode.Uri.from({ scheme, path: "" }),
+      childrenUri: childrenNames.map((name) => vscode.Uri.from({ scheme, path: "/" + name })),
+    });
+  }
+
+  createDirectoriesIfNeeded(fileUri: vscode.Uri, scheme: string): void {
+    // assume that all URIs represent files
+    // parent is then a directory
+    const parentPath = path.posix.normalize(path.posix.dirname(fileUri.path));
+    const parts = parentPath.split("/");
+
+    let entry: Entry = this.root;
+    const visitedParts = [""];
+    const createdPaths = [];
+    const modifiedPaths = [];
+    for (const part of parts) {
+      if (!part) {
+        continue;
+      }
+      if (entry instanceof File) {
+        throw vscode.FileSystemError.FileNotADirectory(
+          vscode.Uri.from({ scheme, path: visitedParts.join(path.posix.sep) }),
+        );
+      }
+      const child = entry.entries.get(part);
+      if (child) {
+        entry = child;
+        visitedParts.push(part);
+        continue;
+      }
+
+      const newDir = new Directory(part);
+      entry.entries.set(newDir.name, newDir);
+      entry.mtime = Date.now();
+      entry.size += 1;
+      if (!modifiedPaths.length) {
+        modifiedPaths.push(visitedParts.join(path.posix.sep));
+      }
+      visitedParts.push(part);
+      createdPaths.push(visitedParts.join(path.posix.sep));
+
+      entry = newDir;
+    }
+
+    this._fireSoon(
+      ...modifiedPaths.map((path) => ({
+        type: vscode.FileChangeType.Changed,
+        uri: vscode.Uri.from({ scheme, path }),
+      })),
+      ...createdPaths.map((path) => ({
+        type: vscode.FileChangeType.Created,
+        uri: vscode.Uri.from({ scheme, path }),
+      })),
+    );
   }
 }

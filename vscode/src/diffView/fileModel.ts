@@ -36,30 +36,13 @@ export class KonveyorFileModel implements FileItemNavigation<FileItem> {
 
   readonly items: FileItem[] = [];
 
-  constructor(locations: vscode.Location[] | vscode.LocationLink[]) {
-    let last: FileItem | undefined;
-    for (const item of locations.sort(KonveyorFileModel._compareLocations)) {
-      const loc =
-        item instanceof vscode.Location
-          ? item
-          : new vscode.Location(item.targetUri, item.targetRange);
-
-      if (!last || KonveyorFileModel._compareUriIgnoreFragment(last.uri, loc.uri) !== 0) {
-        last = new FileItem(loc.uri.with({ fragment: "" }), "", this);
-        this.items.push(last);
-      }
-    }
-  }
-
-  private static _compareUriIgnoreFragment(a: vscode.Uri, b: vscode.Uri): number {
-    const aStr = a.with({ fragment: "" }).toString();
-    const bStr = b.with({ fragment: "" }).toString();
-    if (aStr < bStr) {
-      return -1;
-    } else if (aStr > bStr) {
-      return 1;
-    }
-    return 0;
+  updateLocations(locations: vscode.Location[]) {
+    this.items.splice(0, this.items.length);
+    locations
+      .toSorted(KonveyorFileModel._compareLocations)
+      .map((item) => new FileItem(item.uri.with({ fragment: "" }), "", this))
+      .forEach((item) => this.items.push(item));
+    this._onDidChange.fire(undefined);
   }
 
   private static _compareLocations(
@@ -167,16 +150,9 @@ export class KonveyorTreeDataProvider implements vscode.TreeDataProvider<FileIte
     result.iconPath = vscode.ThemeIcon.File;
     result.collapsibleState = vscode.TreeItemCollapsibleState.None;
     result.command = {
-      command: "vscode.diff",
+      command: "konveyor.diffView.viewFix",
       title: "Open diff",
-      arguments: [
-        element.uri,
-        vscode.Uri.from({
-          scheme: "konveyorMemFs",
-          path: "/" + vscode.workspace.asRelativePath(element.uri.fsPath),
-        }),
-        "Current file <-> Suggested changes",
-      ],
+      arguments: [element.uri],
     };
     return result;
   }

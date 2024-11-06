@@ -426,6 +426,7 @@
   },
   "devDependencies": {
     "@types/chai": "^5.0.0",
+    "@types/diff": "^6.0.0",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
     "@types/react": "^18.3.8",
@@ -446,6 +447,7 @@
   },
   "dependencies": {
     "@shared/types": "^1.0.0",
-    "babel-loader": "^9.2.1"
+    "babel-loader": "^9.2.1",
+    "diff": "^7.0.0"
   }
 }

@@ -56,18 +56,7 @@ export class Navigation {
   }
 
   private _open(loc: vscode.Location, preserveFocus: boolean) {
-    vscode.commands.executeCommand(
-      "vscode.diff",
-      loc.uri,
-      vscode.Uri.from({
-        scheme: "konveyorMemFs",
-        path: "/" + vscode.workspace.asRelativePath(loc.uri.fsPath),
-      }),
-      "Current file <-> Suggested changes",
-      {
-        preserveFocus,
-      },
-    );
+    vscode.commands.executeCommand("konveyor.diffView.viewFix", loc.uri, preserveFocus);
   }
 
   previous(preserveFocus: boolean): void {
