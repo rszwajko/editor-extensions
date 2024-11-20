@@ -5,6 +5,7 @@ import * as Diff from "diff";
 import path from "path";
 
 import { KONVEYOR_SCHEME, fromRelativeToKonveyor } from "../utilities";
+import { Immutable } from "immer";
 
 export const toLocalChanges = (solution: GetSolutionResult) =>
   solution.changes.map(({ modified, original, diff }) => ({
@@ -17,7 +18,7 @@ export const toLocalChanges = (solution: GetSolutionResult) =>
   }));
 
 export const writeSolutionsToMemFs = async (
-  localChanges: LocalChange[],
+  localChanges: Immutable<LocalChange[]>,
   { memFs }: ExtensionState,
 ) => {
   // TODO: implement logic for deleted/added files

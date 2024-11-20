@@ -4,7 +4,7 @@ import { fromRelativeToKonveyor, KONVEYOR_READ_ONLY_SCHEME } from "../utilities"
 import { FileItem, toUri } from "./fileModel";
 
 export const applyAll = async (state: ExtensionState) => {
-  const localChanges = state.localChanges;
+  const localChanges = state.data.localChanges;
   await Promise.all(
     localChanges.map(({ originalUri, modifiedUri }) =>
       vscode.workspace.fs.copy(modifiedUri, originalUri, { overwrite: true }),
@@ -21,7 +21,7 @@ export const applyAll = async (state: ExtensionState) => {
 };
 
 export const discardAll = async (state: ExtensionState) => {
-  const localChanges = state.localChanges;
+  const localChanges = state.data.localChanges;
   await Promise.all(
     localChanges.map(({ originalUri, modifiedUri }) =>
       vscode.workspace.fs.copy(originalUri, modifiedUri, { overwrite: true }),
