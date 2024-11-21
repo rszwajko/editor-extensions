@@ -47,7 +47,7 @@ class VsCodeExtension {
     try {
       this.checkWorkspace();
       this.registerWebviewProvider(context);
-      registerDiffView(this.state);
+      this.onDidChangeData(registerDiffView(this.state));
       this.registerCommands();
       this.registerLanguageProviders(context);
       vscode.commands.executeCommand("konveyor.loadResultsFromDataFolder");

@@ -7,7 +7,7 @@ import path from "path";
 import { KONVEYOR_SCHEME, fromRelativeToKonveyor } from "../utilities";
 import { Immutable } from "immer";
 
-export const toLocalChanges = (solution: GetSolutionResult) =>
+export const toLocalChanges = (solution: GetSolutionResult): LocalChange[] =>
   solution.changes.map(({ modified, original, diff }) => ({
     modifiedUri: fromRelativeToKonveyor(modified),
     originalUri: Uri.from({
@@ -15,6 +15,7 @@ export const toLocalChanges = (solution: GetSolutionResult) =>
       path: path.join(workspace.workspaceFolders?.[0].uri.fsPath ?? "", original),
     }),
     diff,
+    state: "pending",
   }));
 
 export const writeSolutionsToMemFs = async (
