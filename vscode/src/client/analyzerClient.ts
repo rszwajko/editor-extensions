@@ -226,7 +226,7 @@ export class AnalyzerClient {
     return !!this.kaiRpcServer && !this.kaiRpcServer.killed;
   }
 
-  public async runAnalysis(): Promise<any> {
+  public async runAnalysis(filePaths?: string[]): Promise<any> {
     if (!this.rpcConnection) {
       vscode.window.showErrorMessage("RPC connection is not established.");
       return;
@@ -245,6 +245,7 @@ export class AnalyzerClient {
 
           const requestParams = {
             label_selector: getConfigLabelSelector(),
+            included_paths: filePaths,
           };
 
           this.outputChannel.appendLine(
@@ -268,7 +269,7 @@ export class AnalyzerClient {
             return;
           }
 
-          vscode.commands.executeCommand("konveyor.loadRuleSets", rulesets);
+          vscode.commands.executeCommand("konveyor.loadRuleSets", rulesets, filePaths);
           progress.report({ message: "Results processed!" });
           vscode.window.showInformationMessage("Analysis completed successfully!");
         } catch (err: any) {
