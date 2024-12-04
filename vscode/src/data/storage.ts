@@ -9,6 +9,7 @@ import {
   RULE_SET_DATA_FILE_PREFIX,
   SOLUTION_DATA_FILE_PREFIX,
 } from "../utilities";
+import { Immutable } from "immer";
 
 const MAX_FILES = 5;
 
@@ -65,7 +66,7 @@ const deleteOldestDataFiles = async (prefix: string, maxCount: number) => {
 };
 
 export async function writeDataFile(
-  content: RuleSet[] | Solution,
+  content: Immutable<RuleSet[]> | Solution,
   prefix: string,
   format: "json" = "json",
 ) {

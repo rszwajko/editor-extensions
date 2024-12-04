@@ -16,13 +16,20 @@ import {
   SOLUTION_DATA_FILE_PREFIX,
 } from "../utilities";
 import { castDraft, Immutable } from "immer";
+import { mergeRuleSets } from "../analysis";
 
-export const loadRuleSets = async (state: ExtensionState, ruleSets: RuleSet[]) => {
-  await writeDataFile(ruleSets, RULE_SET_DATA_FILE_PREFIX);
-  state.diagnosticCollection.set(processIncidents(ruleSets));
-  state.mutateData((draft) => {
-    draft.ruleSets = ruleSets;
+export const loadRuleSets = async (
+  state: ExtensionState,
+  receivedRuleSets: RuleSet[],
+  filePaths?: string[],
+) => {
+  const data = state.mutateData((draft) => {
+    draft.ruleSets = filePaths
+      ? mergeRuleSets(draft.ruleSets, receivedRuleSets, filePaths)
+      : receivedRuleSets;
   });
+  await writeDataFile(data.ruleSets, RULE_SET_DATA_FILE_PREFIX);
+  state.diagnosticCollection.set(processIncidents(data.ruleSets));
 };
 export const cleanRuleSets = (state: ExtensionState) => {
   state.diagnosticCollection.clear();
