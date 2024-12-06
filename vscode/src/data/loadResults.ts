@@ -18,11 +18,15 @@ import {
 import { castDraft, Immutable } from "immer";
 
 export const loadRuleSets = async (state: ExtensionState, ruleSets: RuleSet[]) => {
+  console.log("loadRuleSet 1", ruleSets);
   await writeDataFile(ruleSets, RULE_SET_DATA_FILE_PREFIX);
+  console.log("loadRuleSet 2");
   state.diagnosticCollection.set(processIncidents(ruleSets));
+  console.log("loadRuleSet 3");
   state.mutateData((draft) => {
     draft.ruleSets = ruleSets;
   });
+  console.log("loadRuleSet 4");
 };
 export const cleanRuleSets = (state: ExtensionState) => {
   state.diagnosticCollection.clear();
