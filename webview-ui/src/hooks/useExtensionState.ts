@@ -27,10 +27,8 @@ export function useExtensionState(): [
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent<ExtensionData>) => {
-      console.warn("useExtensionState - handleMessage", event);
       setState(event.data);
     };
-    console.warn("useExtensionState - useEffect");
     window.addEventListener("message", handleMessage);
 
     return () => {
