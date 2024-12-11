@@ -62,7 +62,7 @@ export class IssuesModel {
           // expect non-empty path in format file:///some/file.ext
           it.uri &&
           // expect 1-based numbering (vscode.Position is zero-based)
-          it.lineNumber > 0,
+          it.lineNumber! > 0,
       );
 
     const incidentsByMsg: { [msg: string]: [string, Incident][] } = allIncidents
@@ -108,7 +108,7 @@ export class IssuesModel {
               uri,
               incidents
                 .map((it) => new ReferenceItem(it, uri, this))
-                .toSorted((a, b) => a.incident.lineNumber - b.incident.lineNumber),
+                .toSorted((a, b) => a.incident.lineNumber! - b.incident.lineNumber!),
               msg,
               this,
             ),

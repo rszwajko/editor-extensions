@@ -29,10 +29,10 @@
   "contributes": {
     "commands": [
       {
-        "command": "konveyor.toggleFullScreen",
-        "title": "Toggle Fullscreen",
+        "command": "konveyor.showAnalysisPanel",
+        "title": "Open Konveyor Analysis View",
         "category": "Konveyor",
-        "icon": "$(fullscreen)"
+        "icon": "$(book)"
       },
       {
         "command": "konveyor.overrideAnalyzerBinaries",
@@ -220,12 +220,6 @@
           "name": "Konveyor Issues"
         },
         {
-          "type": "webview",
-          "id": "konveyor.konveyorAnalysisView",
-          "name": "Konveyor Analysis View",
-          "visibility": "visible"
-        },
-        {
           "id": "konveyor.diffView",
           "name": "Konveyor Resolutions"
         }
@@ -234,9 +228,9 @@
     "menus": {
       "view/title": [
         {
-          "command": "konveyor.toggleFullScreen",
+          "command": "konveyor.showAnalysisPanel",
           "group": "navigation@1",
-          "when": "view == konveyor.konveyorAnalysisView"
+          "when": "view == konveyor.issueView"
         },
         {
           "command": "konveyor.applyAll",
@@ -284,13 +278,6 @@
           "command": "konveyor.copyPath",
           "group": "2@2",
           "when": "view == konveyor.diffView && viewItem == file-item"
-        }
-      ],
-      "editor/title": [
-        {
-          "command": "konveyor.toggleFullScreen",
-          "group": "navigation@1",
-          "when": "activeWebviewPanelId == konveyor.konveyorAnalysisView"
         }
       ],
       "diffEditor/gutter/selection": [
