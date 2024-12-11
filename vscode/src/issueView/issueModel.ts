@@ -139,15 +139,18 @@ export class IssuesModel {
       (prev, cur) => new Set([...cur.files.map((it) => it.uri), ...Array.from(prev)]),
       new Set(),
     ).size;
-    const total = this.items.length;
-    if (total === 1 && files === 1) {
-      return vscode.l10n.t("{0} result in {1} file", total, files);
-    } else if (total === 1) {
-      return vscode.l10n.t("{0} result in {1} files", total, files);
+    const totalIncidents = this.items.reduce(
+      (sum, it) => sum + it.files.reduce((sum, fileItem) => sum + fileItem.references.length, 0),
+      0,
+    );
+    if (totalIncidents === 1 && files === 1) {
+      return vscode.l10n.t("{0} result in {1} file", totalIncidents, files);
+    } else if (totalIncidents === 1) {
+      return vscode.l10n.t("{0} result in {1} files", totalIncidents, files);
     } else if (files === 1) {
-      return vscode.l10n.t("{0} results in {1} file", total, files);
+      return vscode.l10n.t("{0} results in {1} file", totalIncidents, files);
     } else {
-      return vscode.l10n.t("{0} results in {1} files", total, files);
+      return vscode.l10n.t("{0} results in {1} files", totalIncidents, files);
     }
   }
 
