@@ -22,12 +22,19 @@ export function registerIssueView({
     treeView.message = model.message;
   });
 
+  let firstLoad = true;
   let lastRuleSets: Immutable<RuleSet[]> = [];
   return (data: Immutable<ExtensionData>) => {
     // by-reference comparison assumes immutable state object
     if (lastRuleSets !== data.ruleSets) {
       model.updateIssues(data.ruleSets);
       lastRuleSets = data.ruleSets;
+    }
+    if (firstLoad) {
+      firstLoad = false;
+      // TODO: re-implement to be explicitly part of the extension lifecycle
+      // current code relies on the side effects
+      vscode.commands.executeCommand("konveyor.showAnalysisPanel");
     }
   };
 }
