@@ -30,6 +30,7 @@
 import { Incident, RuleSet } from "@editor-extensions/shared";
 import { Immutable } from "immer";
 import * as vscode from "vscode";
+import { allIncidents } from "./transformation";
 
 export class IssuesModel {
   private _onDidChange = new vscode.EventEmitter<
@@ -49,23 +50,7 @@ export class IssuesModel {
   }
 
   updateIssues(ruleSets: Immutable<RuleSet[]>) {
-    const allIncidents: Incident[] = ruleSets
-      .flatMap((r) => Object.values(r.violations ?? {}))
-      .flatMap((v) => v?.incidents ?? [])
-      // ensure basic properties are valid
-      .filter(
-        (it) =>
-          // allow empty messages (they will be grouped together)
-          typeof it.message === "string" &&
-          typeof it.uri === "string" &&
-          Number.isInteger(it.lineNumber) &&
-          // expect non-empty path in format file:///some/file.ext
-          it.uri &&
-          // expect 1-based numbering (vscode.Position is zero-based)
-          it.lineNumber! > 0,
-      );
-
-    const incidentsByMsg: { [msg: string]: [string, Incident][] } = allIncidents
+    const incidentsByMsg: { [msg: string]: [string, Incident][] } = allIncidents(ruleSets)
       .map((it): [string, string, Incident] => [it.message, it.uri, it])
       .reduce(
         (acc, [msg, uri, incident]) => {
@@ -130,6 +115,23 @@ export class IssuesModel {
 
   // --- adapter
 
+  countIncidents() {
+    return this.items.reduce(
+      (sum, it) => sum + it.files.reduce((sum, fileItem) => sum + fileItem.references.length, 0),
+      0,
+    );
+  }
+
+  get badge(): vscode.ViewBadge | undefined {
+    const numberOfIncidents = this.countIncidents();
+    return numberOfIncidents
+      ? {
+          tooltip: `${numberOfIncidents} incident(s) found`,
+          value: numberOfIncidents,
+        }
+      : undefined;
+  }
+
   get message() {
     if (this.items.length === 0) {
       return vscode.l10n.t("No results.");
@@ -139,10 +141,7 @@ export class IssuesModel {
       (prev, cur) => new Set([...cur.files.map((it) => it.uri), ...Array.from(prev)]),
       new Set(),
     ).size;
-    const totalIncidents = this.items.reduce(
-      (sum, it) => sum + it.files.reduce((sum, fileItem) => sum + fileItem.references.length, 0),
-      0,
-    );
+    const totalIncidents = this.countIncidents();
     if (totalIncidents === 1 && files === 1) {
       return vscode.l10n.t("{0} result in {1} file", totalIncidents, files);
     } else if (totalIncidents === 1) {
@@ -267,6 +266,10 @@ export class IncidentTypeItem {
     readonly files: Array<FileItem>,
     readonly model: IssuesModel,
   ) {}
+
+  public hasOneChild() {
+    return this.files.length === 1;
+  }
 }
 
 export class FileItem {
@@ -281,6 +284,10 @@ export class FileItem {
       vscode.Uri.parse(uri),
       new vscode.Position(0, Number.MAX_SAFE_INTEGER),
     );
+  }
+
+  public hasOneChild() {
+    return this.references.length === 1;
   }
 
   getParent() {
@@ -310,6 +317,9 @@ export class ReferenceItem {
         new vscode.Position(safeLineNumber, Number.MAX_SAFE_INTEGER),
       ),
     );
+  }
+  public hasOneChild() {
+    return true;
   }
 
   async getDocument() {

@@ -31,6 +31,7 @@ import {
   updateGenAiKey,
 } from "./utilities/configuration";
 import { runPartialAnalysis } from "./analysis";
+import { IncidentTypeItem } from "./issueView";
 
 let fullScreenPanel: WebviewPanel | undefined;
 
@@ -387,6 +388,12 @@ const commandsMap: (state: ExtensionState) => {
       resolutionProvider?.showWebviewPanel();
     },
     "konveyor.showAnalysisPanel": () => {
+      const resolutionProvider = state.webviewProviders?.get("sidebar");
+      resolutionProvider?.showWebviewPanel();
+    },
+    "konveyor.openAnalysisDetails": async (item: IncidentTypeItem) => {
+      //TODO: pass the item to webview and move the focus
+      console.log("Open details for ", item);
       const resolutionProvider = state.webviewProviders?.get("sidebar");
       resolutionProvider?.showWebviewPanel();
     },
