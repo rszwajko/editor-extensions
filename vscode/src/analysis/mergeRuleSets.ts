@@ -5,6 +5,12 @@ export const mergeRuleSets = (
   received: RuleSet[],
   filePaths: string[],
 ): RuleSet[] => {
+  if (draft.length === 0) {
+    // there were no full analysis yet or it's results were deleted
+    // nothing to merge - take the whole partial analysis response
+    draft.push(...received);
+    return draft;
+  }
   // remove old incidents in the files included in the partial analysis
   draft
     .flatMap((it) => [...Object.values(it.violations ?? {})])
@@ -21,7 +27,10 @@ export const mergeRuleSets = (
     ])
     .map(([name, violations]): [string, [string, Violation][]] => [
       name,
-      violations.filter(([, violation]) => violation.incidents?.length),
+      // reject incidents outside of requested scope
+      violations.filter(
+        ([, violation]) => violation.incidents?.filter((it) => filePaths.includes(it.uri))?.length,
+      ),
     ])
     .filter(([, violations]) => violations.length)
     // remaining violations contain incidents

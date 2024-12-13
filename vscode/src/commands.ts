@@ -371,7 +371,8 @@ const commandsMap: (state: ExtensionState) => {
       // Update the user settings
       await updateLabelSelector(modifiedLabelSelector);
     },
-    "konveyor.loadRuleSets": async (ruleSets: RuleSet[]) => loadRuleSets(state, ruleSets),
+    "konveyor.loadRuleSets": async (ruleSets: RuleSet[], filePaths: string[]) =>
+      loadRuleSets(state, ruleSets, filePaths),
     "konveyor.cleanRuleSets": () => cleanRuleSets(state),
     "konveyor.loadStaticResults": loadStaticResults,
     "konveyor.loadResultsFromDataFolder": loadResultsFromDataFolder,

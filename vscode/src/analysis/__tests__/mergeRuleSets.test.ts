@@ -74,3 +74,33 @@ describe("mergeRuleSets() adds new violations/incidents in the chosen files", ()
     expect(foo.violations?.["foo-01"].incidents[0].message).toBe("new message");
   });
 });
+
+describe("mergeRuleSets() workarounds", () => {
+  it("ignores files outside of included_paths received in analysis response", () => {
+    const responseWithUnknownFile = produce(FOO, (draft: RuleSet) => {
+      draft.violations!["foo-01"].incidents = [
+        {
+          uri: "file:///src/UnknownFile.java",
+          message: "new message",
+        },
+      ];
+    });
+    const merged: RuleSet[] = produce(BASE_STATE, (draft) =>
+      mergeRuleSets(draft, [responseWithUnknownFile], SAVED_FILES),
+    );
+    expect(merged).toHaveLength(3);
+    const [foo] = merged;
+
+    expect(foo.violations?.["foo-01"].incidents).toHaveLength(0);
+  });
+  it("takes the whole partial response if there is no base response in the state", () => {
+    const merged: RuleSet[] = produce([] as RuleSet[], (draft) =>
+      mergeRuleSets(draft, PARTIAL_SINGLE_INCIDENT, SAVED_FILES),
+    );
+    expect(merged).toHaveLength(1);
+    const [foo] = merged;
+
+    expect(foo.violations?.["foo-01"].incidents).toHaveLength(1);
+    expect(foo.violations?.["foo-01"].incidents[0].message).toBe("new message");
+  });
+});
