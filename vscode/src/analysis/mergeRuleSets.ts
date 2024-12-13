@@ -1,6 +1,18 @@
 import { RuleSet, Violation } from "@editor-extensions/shared";
-
+import { Immutable } from "immer";
+import { Uri } from "vscode";
 export const mergeRuleSets = (
+  draft: RuleSet[],
+  received: RuleSet[],
+  fileUris: Uri[],
+): RuleSet[] => {
+  // use the same path representation as in the response
+  // which is file:///some/path/File.java
+  const filePaths = fileUris.map((uri) => uri.toString());
+  return mergeRuleSetsWithStringPaths(draft, received, filePaths);
+};
+
+export const mergeRuleSetsWithStringPaths = (
   draft: RuleSet[],
   received: RuleSet[],
   filePaths: string[],
@@ -66,3 +78,9 @@ export const mergeRuleSets = (
 
   return draft;
 };
+
+export const countIncidentsOnPaths = (ruleSets: Immutable<RuleSet[]>, filePaths: string[]) =>
+  ruleSets
+    .flatMap((r) => Object.values(r.violations ?? {}))
+    .flatMap((v) => v?.incidents ?? [])
+    .filter((it) => filePaths.includes(it.uri)).length;

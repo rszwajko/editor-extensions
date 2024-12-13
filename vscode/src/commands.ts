@@ -371,7 +371,7 @@ const commandsMap: (state: ExtensionState) => {
       // Update the user settings
       await updateLabelSelector(modifiedLabelSelector);
     },
-    "konveyor.loadRuleSets": async (ruleSets: RuleSet[], filePaths: string[]) =>
+    "konveyor.loadRuleSets": async (ruleSets: RuleSet[], filePaths: Uri[]) =>
       loadRuleSets(state, ruleSets, filePaths),
     "konveyor.cleanRuleSets": () => cleanRuleSets(state),
     "konveyor.loadStaticResults": loadStaticResults,
@@ -404,7 +404,7 @@ const commandsMap: (state: ExtensionState) => {
     "konveyor.diffView.applyBlockInline": applyBlock,
     "konveyor.diffView.applySelection": applyBlock,
     "konveyor.diffView.applySelectionInline": applyBlock,
-    "konveyor.partialAnalysis": async (filePaths: string[]) => runPartialAnalysis(state, filePaths),
+    "konveyor.partialAnalysis": async (filePaths: Uri[]) => runPartialAnalysis(state, filePaths),
     "konveyor.configureGetSolutionParams": async () => {
       const maxPriorityInput = await window.showInputBox({
         prompt: "Enter max_priority for getSolution",

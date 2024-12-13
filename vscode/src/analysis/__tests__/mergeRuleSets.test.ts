@@ -1,6 +1,6 @@
 import { RuleSet } from "@editor-extensions/shared";
 import { produce } from "immer";
-import { mergeRuleSets } from "../mergeRuleSets";
+import { mergeRuleSetsWithStringPaths as mergeRuleSets } from "../mergeRuleSets";
 import expect from "expect";
 import { FOO, BAR, DISCOVERY } from "./data";
 
