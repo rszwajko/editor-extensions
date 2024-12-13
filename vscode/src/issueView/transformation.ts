@@ -12,7 +12,7 @@ export const allIncidents = (ruleSets: Immutable<RuleSet[]>): Incident[] =>
         typeof it.message === "string" &&
         typeof it.uri === "string" &&
         // expect non-empty path in format file:///some/file.ext
-        it.uri,
+        it.uri.startsWith("file://"),
     )
     .map((it) => ({
       ...it,
