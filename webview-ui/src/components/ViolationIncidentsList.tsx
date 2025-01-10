@@ -1,7 +1,6 @@
 import "./violations.css";
 import React, { useState, useCallback, useMemo } from "react";
 import {
-  Badge,
   Flex,
   FlexItem,
   Content,
@@ -17,16 +16,14 @@ import {
   Label,
   MenuToggleElement,
   InputGroup,
-  DataListAction,
-  DataListCell,
-  DataListItem,
-  DataListItemCells,
-  DataListItemRow,
   CardHeader,
   CardExpandableContent,
 } from "@patternfly/react-core";
-import { SortAmountDownIcon, TimesIcon, FileIcon, LightbulbIcon } from "@patternfly/react-icons";
+import { SortAmountDownIcon, TimesIcon } from "@patternfly/react-icons";
 import { Incident, Violation, Severity } from "@editor-extensions/shared";
+import { groupIncidentsByMsg } from "../utils/transformation";
+import { IncidentTable } from "./IncidentTable";
+import ViolationActionsDropdown from "./ViolationActionsDropdown";
 
 type SortOption = "description" | "incidentCount" | "severity";
 
@@ -35,29 +32,27 @@ interface ViolationIncidentsListProps {
   violations: Violation[];
   focusedIncident?: Incident | null;
   onIncidentSelect: (incident: Incident) => void;
-  onGetSolution: (incident: Incident, violation: Violation) => void;
+  onGetSolution: (incidents: Incident[], violation: Violation) => void;
   onGetAllSolutions: (violation) => void;
   onOpenChat?: () => void;
   compact?: boolean;
   expandedViolations: Set<string>;
   setExpandedViolations: React.Dispatch<React.SetStateAction<Set<string>>>;
+  workspaceRoot: string;
 }
 
 const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
-  isRunning,
   violations,
   onIncidentSelect,
   compact = false,
   expandedViolations,
   setExpandedViolations,
-  onOpenChat,
   onGetSolution,
-  onGetAllSolutions,
+  workspaceRoot,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("description");
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   const toggleViolation = useCallback(
     (violationId: string) => {
@@ -135,62 +130,6 @@ const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
     return result;
   }, [violations, searchTerm, sortBy]);
 
-  const renderIncident = useCallback(
-    (incident: Incident, violation: Violation) => {
-      const fileName = incident.uri.slice(incident.uri.lastIndexOf("/") + 1);
-      const uniqueId = `${incident.uri}-${incident.lineNumber}`;
-      const isOpen = openDropdownId === uniqueId;
-
-      const toggleDropdown = () => {
-        setOpenDropdownId((prevId) => (prevId === uniqueId ? null : uniqueId));
-      };
-
-      return (
-        <DataListItem key={uniqueId} aria-labelledby={`incident-${uniqueId}`}>
-          <DataListItemRow>
-            <DataListItemCells
-              dataListCells={[
-                <DataListCell key="icon" width={1}>
-                  <FileIcon />
-                  <Button component="a" variant="link" onClick={() => onIncidentSelect(incident)}>
-                    {fileName}
-                  </Button>
-                </DataListCell>,
-                <DataListCell key="file" width={2}>
-                  <Content component="p">Line {incident.lineNumber}</Content>
-                </DataListCell>,
-                <DataListCell key="message" width={5}>
-                  <Content component="small">{incident.message}</Content>
-                </DataListCell>,
-                <DataListCell key="severity" width={1}>
-                  <Badge isRead={incident?.severity !== "High"}>
-                    <Content component="h6" style={{ margin: 0 }}>
-                      {incident.severity}
-                    </Content>
-                  </Badge>
-                </DataListCell>,
-              ]}
-            />
-            <DataListAction
-              aria-labelledby={`incident-${uniqueId} incident-${uniqueId}-actions`}
-              id={`incident-${uniqueId}-actions`}
-              aria-label="Actions"
-            >
-              {onGetSolution && isRunning && (
-                <Button
-                  variant="link"
-                  icon={<LightbulbIcon className="lightbulb-icon-style" />}
-                  onClick={() => onGetSolution(incident, violation)}
-                ></Button>
-              )}
-            </DataListAction>
-          </DataListItemRow>
-        </DataListItem>
-      );
-    },
-    [onIncidentSelect, openDropdownId, onOpenChat],
-  );
-
   const renderViolation = useCallback(
     (violation: Violation) => {
       const truncateText = (text: string, maxLength: number) => {
@@ -211,14 +150,14 @@ const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
           style={{ marginBottom: "10px" }}
         >
           <CardHeader
-            // actions={{
-            //   actions: (
-            //     <ViolationActionsDropdown
-            //       violation={violation}
-            //       onGetAllSolutions={onGetAllSolutions}
-            //     />
-            //   ),
-            // }}
+            actions={{
+              actions: (
+                <ViolationActionsDropdown
+                  onGetAllSolutions={() => onGetSolution(violation.incidents ?? [], violation)}
+                  fixMessage="Fix violation"
+                />
+              ),
+            }}
             onExpand={() => toggleViolation(violation.description)}
           >
             <Content style={{ marginBottom: "5px" }}>{truncatedDescription}</Content>
@@ -242,17 +181,22 @@ const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
           </CardHeader>
           <CardExpandableContent>
             <CardBody>
-              {violation.incidents.map((incident) => (
-                <div key={`${incident.uri}-${incident.lineNumber}`}>
-                  {renderIncident(incident, violation)}
-                </div>
+              {Object.entries(groupIncidentsByMsg(violation.incidents)).map(([message, tuples]) => (
+                <IncidentTable
+                  onIncidentSelect={onIncidentSelect}
+                  key={message}
+                  message={message}
+                  getSolution={(incidents: Incident[]) => onGetSolution(incidents, violation)}
+                  incidents={tuples.map(([, incident]) => incident)}
+                  workspaceRoot={workspaceRoot}
+                />
               ))}
             </CardBody>
           </CardExpandableContent>
         </Card>
       );
     },
-    [expandedViolations, toggleViolation, renderIncident],
+    [expandedViolations, toggleViolation],
   );
 
   const onSortToggle = () => {

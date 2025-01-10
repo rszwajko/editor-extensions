@@ -34,7 +34,7 @@ import {
   updateGetSolutionMaxPriority,
 } from "./utilities/configuration";
 import { runPartialAnalysis } from "./analysis";
-import { IncidentTypeItem } from "./issueView";
+import { fixGroupOfIncidents, IncidentTypeItem } from "./issueView";
 
 // let fullScreenPanel: WebviewPanel | undefined;
 
@@ -399,6 +399,7 @@ const commandsMap: (state: ExtensionState) => {
       const resolutionProvider = state.webviewProviders?.get("sidebar");
       resolutionProvider?.showWebviewPanel();
     },
+    "konveyor.fixGroupOfIncidents": fixGroupOfIncidents,
     "konveyor.reloadLastResolutions": async () => reloadLastResolutions(state),
     "konveyor.diffView.applyBlock": applyBlock,
     "konveyor.diffView.applyBlockInline": applyBlock,

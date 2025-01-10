@@ -53,6 +53,12 @@
         "icon": "$(expand-all)"
       },
       {
+        "command": "konveyor.fixGroupOfIncidents",
+        "title": "Fix group of incidents",
+        "category": "Konveyor",
+        "icon": "$(debug-console)"
+      },
+      {
         "command": "konveyor.openAnalysisDetails",
         "title": "Open Details",
         "category": "Konveyor",
@@ -284,6 +290,11 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "konveyor.fixGroupOfIncidents",
+          "group": "inline@3",
+          "when": "view == konveyor.issueView && viewItem == incident-type-item"
+        },
         {
           "command": "konveyor.expandSingleIssue",
           "group": "inline@2",
