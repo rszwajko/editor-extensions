@@ -27,3 +27,5 @@ export interface WebviewAction<S, T> {
   type: S;
   payload: T;
 }
+
+export const foo = () => "foo";

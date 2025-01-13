@@ -21,11 +21,12 @@ import IncidentList from "./IncidentList";
 import { FileChanges } from "./FileChanges";
 import { CodePreview } from "./CodePreview";
 import { LoadingScreen } from "./LoadingScreen";
-import { LocalChange } from "@editor-extensions/shared";
+import { LocalChange, foo } from "@editor-extensions/shared";
 import { useExtensionState } from "../hooks/useExtensionState";
 import { applyFile, discardFile, viewFix } from "../hooks/actions";
 
 const ResolutionPage: React.FC = () => {
+  console.log("hello from ", foo());
   const [state, dispatch] = useExtensionState();
   const {
     localChanges,
