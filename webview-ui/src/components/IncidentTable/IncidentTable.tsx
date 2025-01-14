@@ -42,7 +42,11 @@ export const IncidentTable: FC<IncidentTableProps> = ({
             actions: (
               <ViolationActionsDropdown
                 onGetAllSolutions={() => getSolution(incidents)}
-                fixMessage="Fix group of incidents"
+                fixMessage={
+                  incidents.length === 1
+                    ? "Resolve 1 incident"
+                    : `Resolve the ${incidents.length} incidents`
+                }
               />
             ),
           }}
@@ -82,7 +86,7 @@ export const IncidentTable: FC<IncidentTableProps> = ({
                     <Td isActionCell>
                       <ViolationActionsDropdown
                         onGetAllSolutions={() => getSolution([it])}
-                        fixMessage="Fix incident"
+                        fixMessage="Resolve this incident"
                       />
                     </Td>
                   </Tr>

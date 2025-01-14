@@ -32,7 +32,7 @@ const ViolationActionsDropdown: React.FC<ViolationActionsDropdownProps> = ({
       onOpenChange={(flag) => setIsOpen(flag)}
       popperProps={{
         appendTo: document.body,
-        position: "left",
+        position: "right",
         direction: "up",
         enableFlip: true,
       }}

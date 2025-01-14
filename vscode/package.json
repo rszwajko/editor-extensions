@@ -60,13 +60,13 @@
       },
       {
         "command": "konveyor.fixGroupOfIncidents",
-        "title": "Fix group of incidents",
+        "title": "Resolve incidents",
         "category": "Konveyor",
         "icon": "$(debug-console)"
       },
       {
         "command": "konveyor.fixIncident",
-        "title": "Fix incident",
+        "title": "Resolve incident",
         "category": "Konveyor",
         "icon": "$(debug-console)"
       },
