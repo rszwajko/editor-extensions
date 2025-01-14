@@ -154,7 +154,11 @@ const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
               actions: (
                 <ViolationActionsDropdown
                   onGetAllSolutions={() => onGetSolution(violation.incidents ?? [], violation)}
-                  fixMessage="Fix violation"
+                  fixMessage={
+                    violation.incidents?.length === 1
+                      ? "Resolve 1 incident within this issue"
+                      : `Resolve the ${violation.incidents?.length ?? 0} incidents within this issue`
+                  }
                 />
               ),
             }}
