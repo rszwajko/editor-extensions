@@ -122,8 +122,10 @@ export interface ExtensionData {
   isFetchingSolution: boolean;
   isStartingServer: boolean;
   serverState: ServerState;
+  solutionState: SolutionState;
   solutionData?: Solution;
   solutionScope?: Scope;
+  solutionMessages: string[];
 }
 
 export type ServerState =
@@ -136,3 +138,11 @@ export type ServerState =
   | "running"
   | "stopping"
   | "stopped";
+
+export type SolutionState =
+  | "none"
+  | "started"
+  | "sent"
+  | "received"
+  | "failedOnStart"
+  | "failedOnSending";

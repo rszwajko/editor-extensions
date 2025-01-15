@@ -4,7 +4,14 @@ import { setTimeout } from "node:timers/promises";
 import * as fs from "fs-extra";
 import * as vscode from "vscode";
 import * as rpc from "vscode-jsonrpc/node";
-import { Incident, RuleSet, SolutionResponse, Violation } from "@editor-extensions/shared";
+import {
+  Incident,
+  RuleSet,
+  Scope,
+  SolutionResponse,
+  SolutionState,
+  Violation,
+} from "@editor-extensions/shared";
 import { ExtensionData, ServerState } from "@editor-extensions/shared";
 import { buildDataFolderPath } from "../data";
 import { Extension } from "../helpers/Extension";
@@ -41,7 +48,7 @@ export class AnalyzerClient {
   private kaiConfigToml: string;
   private fireStateChange: (state: ServerState) => void;
   private fireAnalysisStateChange: (flag: boolean) => void;
-  private fireSolutionStateChange: (flag: boolean) => void;
+  private fireSolutionStateChange: (state: SolutionState, message?: string, scope?: Scope) => void;
 
   constructor(
     private extContext: vscode.ExtensionContext,
@@ -57,9 +64,16 @@ export class AnalyzerClient {
       mutateExtensionData((draft) => {
         draft.isAnalyzing = flag;
       });
-    this.fireSolutionStateChange = (flag: boolean) =>
+    this.fireSolutionStateChange = (state: SolutionState, message?: string, scope?: Scope) =>
       mutateExtensionData((draft) => {
-        draft.isFetchingSolution = flag;
+        draft.isFetchingSolution = state === "sent";
+        if (state === "started") {
+          draft.solutionMessages = [];
+          draft.solutionScope = scope;
+        }
+        if (message) {
+          draft.solutionMessages.push(message);
+        }
       });
 
     this.outputChannel = vscode.window.createOutputChannel("Konveyor-Analyzer");
@@ -495,12 +509,13 @@ export class AnalyzerClient {
   ): Promise<void> {
     // TODO: Ensure serverState is running
 
+    this.fireSolutionStateChange("started", "Checking server state...", { incidents, violation });
+
     if (!this.rpcConnection) {
       vscode.window.showErrorMessage("RPC connection is not established.");
+      this.fireSolutionStateChange("failedOnStart", "RPC connection is not established.");
       return;
     }
-
-    this.fireSolutionStateChange(true);
 
     const enhancedIncidents = incidents.map((incident) => ({
       ...incident,
@@ -525,21 +540,27 @@ export class AnalyzerClient {
         `getCodeplanAgentSolution request: ${JSON.stringify(request, null, 2)}`,
       );
 
+      this.fireSolutionStateChange("sent", "Waiting for the resolution...");
       const response: SolutionResponse = await this.rpcConnection!.sendRequest(
         "getCodeplanAgentSolution",
         request,
       );
 
+      this.fireSolutionStateChange("received", "Received response...");
       vscode.commands.executeCommand("konveyor.loadSolution", response, {
         incidents,
         violation,
       });
     } catch (err: any) {
       this.outputChannel.appendLine(`Error during getSolution: ${err.message}`);
-      vscode.window.showErrorMessage("Get solution failed. See the output channel for details.");
+      vscode.window.showErrorMessage(
+        "Failed to provide resolutions. See the output channel for details.",
+      );
+      this.fireSolutionStateChange(
+        "failedOnSending",
+        `Failed to provide resolutions. Encountered error: ${err.message}. See the output channel for details.`,
+      );
     }
-
-    this.fireSolutionStateChange(false);
   }
 
   public canAnalyze(): boolean {

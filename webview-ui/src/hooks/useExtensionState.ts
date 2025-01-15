@@ -12,6 +12,8 @@ const defaultState: ExtensionData = {
   solutionData: undefined,
   serverState: "initial",
   solutionScope: undefined,
+  solutionMessages: [],
+  solutionState: "none",
 };
 
 const windowState =

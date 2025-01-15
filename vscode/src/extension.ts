@@ -30,6 +30,8 @@ class VsCodeExtension {
         solutionData: undefined,
         serverState: "initial",
         solutionScope: undefined,
+        solutionMessages: [],
+        solutionState: "none",
       },
       () => {},
     );
