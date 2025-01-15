@@ -21,8 +21,7 @@ import {
 } from "@patternfly/react-core";
 import { SortAmountDownIcon, TimesIcon } from "@patternfly/react-icons";
 import { Incident, Violation, Severity } from "@editor-extensions/shared";
-import { groupIncidentsByMsg } from "../utils/transformation";
-import { IncidentTable } from "./IncidentTable";
+import { IncidentTableGroup } from "./IncidentTable";
 import ViolationActionsDropdown from "./ViolationActionsDropdown";
 
 type SortOption = "description" | "incidentCount" | "severity";
@@ -185,16 +184,12 @@ const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
           </CardHeader>
           <CardExpandableContent>
             <CardBody>
-              {Object.entries(groupIncidentsByMsg(violation.incidents)).map(([message, tuples]) => (
-                <IncidentTable
-                  onIncidentSelect={onIncidentSelect}
-                  key={message}
-                  message={message}
-                  getSolution={(incidents: Incident[]) => onGetSolution(incidents, violation)}
-                  incidents={tuples.map(([, incident]) => incident)}
-                  workspaceRoot={workspaceRoot}
-                />
-              ))}
+              <IncidentTableGroup
+                onGetSolution={onGetSolution}
+                onIncidentSelect={onIncidentSelect}
+                violation={violation}
+                workspaceRoot={workspaceRoot}
+              />
             </CardBody>
           </CardExpandableContent>
         </Card>
