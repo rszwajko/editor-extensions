@@ -39,6 +39,7 @@ export const IncidentTable: FC<IncidentTableProps> = ({
       <Card isPlain>
         <CardHeader
           actions={{
+            hasNoOffset: true,
             actions: (
               <ViolationActionsDropdown
                 onGetAllSolutions={() => getSolution(incidents)}
@@ -50,9 +51,9 @@ export const IncidentTable: FC<IncidentTableProps> = ({
               />
             ),
           }}
-        />
-
-        <CardBody>{message}</CardBody>
+        >
+          {message}
+        </CardHeader>
 
         <Card isPlain>
           <CardBody>
