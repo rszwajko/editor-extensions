@@ -27,7 +27,7 @@ import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import ProgressIndicator from "../ProgressIndicator";
 import ViolationIncidentsList from "../ViolationIncidentsList";
-import { Incident } from "@editor-extensions/shared";
+import { Incident, Violation } from "@editor-extensions/shared";
 import { useExtensionState } from "../../hooks/useExtensionState";
 import {
   cancelSolution,
@@ -73,7 +73,7 @@ const AnalysisPage: React.FC = () => {
       return [];
     }
     return analysisResults.flatMap((ruleSet) =>
-      Object.entries(ruleSet.violations || {}).map(([id, violation]) => ({
+      Object.entries<Violation>(ruleSet.violations || {}).map(([id, violation]) => ({
         id,
         ...violation,
       })),

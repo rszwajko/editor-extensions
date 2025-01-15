@@ -9,7 +9,7 @@ export interface IncidentTableProps {
   workspaceRoot: string;
   incidents: Incident[];
   message: string;
-  getSolution: (incidents: Incident[]) => void;
+  getSolution?: (incidents: Incident[]) => void;
   onIncidentSelect: (it: Incident) => void;
 }
 
@@ -38,19 +38,23 @@ export const IncidentTable: FC<IncidentTableProps> = ({
     <>
       <Card isPlain>
         <CardHeader
-          actions={{
-            hasNoOffset: true,
-            actions: (
-              <ViolationActionsDropdown
-                onGetAllSolutions={() => getSolution(incidents)}
-                fixMessage={
-                  incidents.length === 1
-                    ? "Resolve 1 incident"
-                    : `Resolve the ${incidents.length} incidents`
+          actions={
+            getSolution
+              ? {
+                  hasNoOffset: true,
+                  actions: (
+                    <ViolationActionsDropdown
+                      onGetAllSolutions={() => getSolution(incidents)}
+                      fixMessage={
+                        incidents.length === 1
+                          ? "Resolve 1 incident"
+                          : `Resolve the ${incidents.length} incidents`
+                      }
+                    />
+                  ),
                 }
-              />
-            ),
-          }}
+              : undefined
+          }
         >
           {message}
         </CardHeader>
@@ -85,10 +89,14 @@ export const IncidentTable: FC<IncidentTableProps> = ({
                       </TableText>
                     </Td>
                     <Td isActionCell>
-                      <ViolationActionsDropdown
-                        onGetAllSolutions={() => getSolution([it])}
-                        fixMessage="Resolve this incident"
-                      />
+                      {getSolution ? (
+                        <ViolationActionsDropdown
+                          onGetAllSolutions={() => getSolution([it])}
+                          fixMessage="Resolve this incident"
+                        />
+                      ) : (
+                        ""
+                      )}
                     </Td>
                   </Tr>
                 ))}
