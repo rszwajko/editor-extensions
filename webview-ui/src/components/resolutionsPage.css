@@ -1,3 +1,24 @@
 .incident-list-card {
   width: 20em;
 }
+
+.pf-v6-c-card.pf-m-blue {
+  background-color: var(--pf-t--global--color--nonstatus--blue--default);
+  max-width: 80%;
+}
+
+.pf-v6-c-card.pf-m-yellow {
+  background-color: var(--pf-t--global--color--nonstatus--yellow--default);
+  max-width: 80%;
+}
+
+.chat-card-container {
+  width: 80%;
+  min-width: 400px;
+  display: flex;
+  justify-items: end;
+}
+
+.chat-card-container * {
+  color: black;
+}
