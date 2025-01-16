@@ -94,7 +94,7 @@ const ResolutionPage: React.FC = () => {
               justifyContent={{ default: "justifyContentFlexEnd" }}
             >
               <FlexItem>
-                <Label color="yellow">Here is the scope of what I would like you to fix:</Label>
+                <YellowLabel>Here is the scope of what I would like you to fix:</YellowLabel>
               </FlexItem>
               <FlexItem className="chat-card-container">
                 <ChatCard color="yellow">
@@ -107,7 +107,7 @@ const ResolutionPage: React.FC = () => {
                 </ChatCard>
               </FlexItem>
               <FlexItem>
-                <Label color="yellow">Please provide resolution for this issue.</Label>
+                <YellowLabel>Please provide resolution for this issue.</YellowLabel>
               </FlexItem>
             </Flex>
           )}
@@ -185,6 +185,17 @@ const ChatCard: FC<{ color: "blue" | "yellow"; children: JSX.Element }> = ({ chi
   <Card className={color === "blue" ? "pf-m-blue" : "pf-m-yellow"}>
     <CardBody>{children}</CardBody>
   </Card>
+);
+
+const YellowLabel: FC<{ children: JSX.Element | string }> = ({ children }) => (
+  <>
+    <Label className="resolutions-show-in-light" color="yellow">
+      {children}
+    </Label>
+    <Label className="resolutions-show-in-dark" variant="outline">
+      {children}
+    </Label>
+  </>
 );
 
 export default ResolutionPage;
