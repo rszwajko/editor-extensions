@@ -1,24 +1,30 @@
-.incident-list-card {
-  width: 20em;
-}
-
 .pf-v6-c-card.pf-m-blue {
   background-color: var(--pf-t--global--color--nonstatus--blue--default);
-  max-width: 80%;
+}
+
+.pf-v6-theme-dark .pf-v6-c-card.pf-m-yellow {
+  background-color: var(--pf-t--global--color--nonstatus--default);
 }
 
 .pf-v6-c-card.pf-m-yellow {
   background-color: var(--pf-t--global--color--nonstatus--yellow--default);
-  max-width: 80%;
 }
 
 .chat-card-container {
   width: 80%;
   min-width: 400px;
   display: flex;
-  justify-items: end;
+  flex-direction: row-reverse;
 }
 
-.chat-card-container * {
+/* .chat-card-container table * {
   color: black;
+} */
+
+.pf-v6-theme-dark .resolutions-show-in-light {
+  display: none;
+}
+
+.pf-v6-theme-dark .resolutions-show-in-dark {
+  display: revert;
 }
