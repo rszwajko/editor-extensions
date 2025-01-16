@@ -66,6 +66,7 @@ export class AnalyzerClient {
     this.fireSolutionStateChange = (state: SolutionState, message?: string, scope?: Scope) =>
       mutateExtensionData((draft) => {
         draft.isFetchingSolution = state === "sent";
+        draft.solutionState = state;
         if (state === "started") {
           draft.solutionMessages = [];
           draft.solutionScope = scope;
