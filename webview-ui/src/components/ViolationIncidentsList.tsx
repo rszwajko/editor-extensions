@@ -1,5 +1,5 @@
 import "./violations.css";
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
   Flex,
   FlexItem,
@@ -39,6 +39,7 @@ interface ViolationIncidentsListProps {
   setExpandedViolations: React.Dispatch<React.SetStateAction<Set<string>>>;
   workspaceRoot: string;
 }
+const SORT_STORAGE_KEY = "violationSortOption";
 
 const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
   violations,
@@ -50,8 +51,14 @@ const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
   workspaceRoot,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("description");
+  const initialSortBy = localStorage?.getItem(SORT_STORAGE_KEY) || "description";
+  const [sortBy, setSortBy] = useState<SortOption>(initialSortBy as SortOption);
+
   const [isSortSelectOpen, setIsSortSelectOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage?.setItem(SORT_STORAGE_KEY, sortBy);
+  }, [sortBy]);
 
   const toggleViolation = useCallback(
     (violationId: string) => {
