@@ -264,14 +264,7 @@ const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
         </Flex>
       </StackItem>
       <StackItem isFilled>
-        <div
-          style={{
-            height: compact ? "200px" : "calc(100vh - 200px)",
-            overflowY: "auto",
-          }}
-        >
-          {filteredAndSortedViolations.map((violation) => renderViolation(violation))}
-        </div>
+        {filteredAndSortedViolations.map((violation) => renderViolation(violation))}
       </StackItem>
     </Stack>
   );

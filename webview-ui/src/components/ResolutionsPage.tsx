@@ -7,6 +7,8 @@ import {
   Label,
   Page,
   PageSection,
+  PageSidebar,
+  PageSidebarBody,
   Spinner,
   Title,
 } from "@patternfly/react-core";
@@ -67,7 +69,13 @@ const ResolutionPage: React.FC = () => {
   });
 
   return (
-    <Page>
+    <Page
+      sidebar={
+        <PageSidebar isSidebarOpen={false}>
+          <PageSidebarBody />
+        </PageSidebar>
+      }
+    >
       <PageSection>
         <Flex>
           <FlexItem>
