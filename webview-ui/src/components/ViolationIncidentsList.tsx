@@ -44,7 +44,6 @@ const SORT_STORAGE_KEY = "violationSortOption";
 const ViolationIncidentsList: React.FC<ViolationIncidentsListProps> = ({
   violations,
   onIncidentSelect,
-  compact = false,
   expandedViolations,
   setExpandedViolations,
   onGetSolution,
